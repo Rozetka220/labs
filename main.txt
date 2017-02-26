@@ -1,0 +1,15 @@
+#include <iostream>
+#include "base.h"
+int main(int argc, char*argv[])
+{
+	base objBase;
+	objBase.Enter();
+	objBase.multiplication();
+	objBase.Rezult();
+	Ring objRing;
+	objRing.Enter();
+	objRing.check();
+	objRing.summary();
+	system("pause");
+	return 0;
+}

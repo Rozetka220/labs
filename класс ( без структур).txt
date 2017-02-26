@@ -1,0 +1,85 @@
+#pragma once
+#include <iostream>
+#include <cmath>
+class base
+{
+protected:
+	double x, y, R, r, multiplicatio;
+	
+public:
+	base()
+	{
+		x = 0;
+		y = 0;
+		R = 0;
+		r = 0;
+	}
+	void Enter()
+	{
+		std::cin >> x
+			>> y
+			>> R
+			>> r;
+	}
+	void multiplication()
+	{
+		
+		multiplicatio = x * y * R * r;
+	}
+
+	void Rezult()
+	{
+		std::cout << x
+			<< y
+			<< R
+			<< r
+			<< " multiplication = " <<  multiplicatio
+			<<std::endl;
+	}
+};
+
+class Ring : public base
+{
+private:
+	bool answer;
+	double S;
+public:
+	Ring() : base()
+	{}
+	int check()
+	{
+		if ((R > r) && (r > 0))
+		{
+			answer = true;
+		}
+		else
+		{
+			answer = false;
+		}
+		return answer;
+	}
+	void summary()
+	{
+		if (answer == true)
+		{
+			double a, b;
+			S = 3.14 * R;
+			std::cout << " Enter point a and b " << std::endl;
+			std::cin >> a
+				>> b;
+			std::cout << "S = " << S << std::endl;
+			if ((pow((a - x), 2) + pow((b - y), 2)) < (R * R))
+			{
+				std::cout << "point a and b include in Ring" << std::endl;
+			}
+			else
+			{
+				std::cout << "Not include in Ring" << std::endl;
+			}
+		}
+		else
+		{
+			std::cout << "Error" << std::endl;
+		}
+	}
+};
