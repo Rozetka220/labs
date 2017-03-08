@@ -1,0 +1,37 @@
+#pragma once
+#include <iostream>
+#include <fstream>
+#include <string>
+//#include <cctype>
+
+using namespace std;
+
+class Stroka
+{
+private:
+	string line;
+	char buff[10], buffer;
+	int i;
+public:
+	void Line()
+	{
+		ofstream Text("LineText.txt");
+		getline(cin, line, '\n');
+		Text << line;
+		Text.close();
+		ifstream in("LineText.txt");
+		while (!in.eof())
+		{
+			in >> buff;
+			i = 0;
+			while (buff[i] != '\0')
+			{
+				buffer = buff[i];
+				cout << (char) toupper(buffer);
+				i++;
+			}
+			cout << " ";
+		}
+		in.close();
+	}
+};
