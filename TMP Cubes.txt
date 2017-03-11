@@ -1,0 +1,235 @@
+#include <iostream>
+#include <string>
+#include <cstdlib>
+#include <clocale>
+#include <conio.h>
+#include <ctime>
+using namespace std;
+										 // 01234567
+	  unsigned char default_dice[9][9] = { "########",//0
+										   "#      #",//1
+										   "#      #",//2
+										   "#      #",//3
+										   "#      #",//4
+										   "#      #",//5
+										   "#      #",//6
+										   "#      #",//7
+										   "########",//8
+										};
+    unsigned char dice[9][9] = { "########",//0
+								 "#      #",//1
+								 "#      #",//2
+								 "#      #",//3
+								 "#      #",//4
+								 "#      #",//5
+								 "#      #",//6
+								 "#      #",//7
+								 "########",//8
+	  };
+int b,p;
+
+void Screen()
+{
+	for (int i = 0; i < 9; i++)
+	{
+		for (int j = 0; j < 9; j++)
+		{
+			cout << dice[i][j];
+		}
+		cout << endl;
+	}
+	cout << "\n \n" << endl;
+}
+
+void Cube()
+{
+	int a, i = 1;
+	while (i <= 2)
+	{
+		a =1 + rand() % 6;;
+		switch (a)
+		{
+		case 1:
+			dice[3][4] = '*';
+			break;
+		case 2:
+			dice[2][5] = '*';
+			dice[4][3] = '*';
+			break;
+		case 3:
+			dice[2][5] = '*';
+			dice[4][3] = '*';
+			dice[3][4] = '*';
+			break;
+		case 4:
+			dice[2][5] = '*';
+			dice[4][3] = '*';
+			dice[2][3] = '*';
+			dice[4][5] = '*';
+			break;
+		case 5:
+			dice[2][5] = '*';
+			dice[2][3] = '*';
+			dice[4][3] = '*';
+			dice[4][5] = '*';
+			dice[3][4] = '*';
+			break;
+		case 6:
+			dice[2][5] = '*';
+			dice[4][3] = '*';
+			dice[2][3] = '*';
+			dice[4][5] = '*';
+			dice[2][4] = '*';
+			dice[4][4] = '*';
+			break;
+		default:
+		{
+			cout << "Что то не так" << endl;
+		}
+		}
+		Screen();
+		b += a;
+		p += a;
+		
+		for (int n=0; n < 9; n++)
+		{
+			for (int m=0; m < 9; m++)
+			{
+				dice[n][m] = default_dice[n][m];
+			}
+		}
+		i++;
+	}
+}
+
+
+
+int main()
+{
+	setlocale(LC_ALL, "Rus");
+	srand(time(NULL));
+	
+	bool FirstPlayer, Or_Re;
+	int CompScore, PlayerScore, All_CompS = 0, All_PlayerS = 0, i = 0;
+	char play,space = 32,Orel_Reshka;
+
+	cout << "\t Выберите: орел или решка? \n O/R \n";
+	cin >> Orel_Reshka;
+	while ((Orel_Reshka != 'R') && (Orel_Reshka != 'O'))
+	{
+		cout << "\t Выберите: орел или решка? \n O/R \n";
+		cin >> Orel_Reshka;
+	}
+
+	FirstPlayer = rand() % 2;
+
+		if (FirstPlayer)
+		{
+			cout << "Выпала решка \n";
+		
+		} 
+		else
+		{
+			cout << "Выпал орел \n";
+		}
+		if (Orel_Reshka == 'O')
+		{
+			Or_Re = 0;
+		}
+		if (Orel_Reshka == 'R')
+		{
+			Or_Re = 1;
+		}
+		if (Or_Re == FirstPlayer)
+		{
+			FirstPlayer = false;
+		}
+		if (Or_Re !=FirstPlayer)
+		{
+			FirstPlayer = true;
+		}
+
+	if (FirstPlayer)
+	{
+		cout << "Первым ходит компьютер " << endl;
+		cout << endl;
+
+		for (int i = 1 ; i <= 4; i++)
+		{
+			cout << "Ход № " << i << " : \n" << endl;
+			
+			Cube();
+			CompScore = b;
+			b = 0;
+			p = 0;
+			All_CompS += CompScore;
+			cout << "Для броска нажмите пробел" << endl;
+			play = _getch();
+			while (play != space)
+			{
+				cout << "Для броска нажмите пробел" << endl;
+				play = _getch();
+			}
+			Cube();
+			PlayerScore = p;
+			p = 0;
+			b = 0;
+			All_PlayerS += PlayerScore;
+	
+			cout << " Компьютер  " << CompScore << " : " << PlayerScore << " Игрок " << endl;
+			cout << " Нажмите кнопку для следующего раунда " << endl;
+			_getch();
+			system("cls");	
+		}
+	}
+	else
+	{
+		cout << "Первым ходит игрок " << endl;
+		cout << endl;
+		 
+		for (int i = 1; i <= 4; i++)
+		{
+		cout << "Ход № " << i << " : \n" << endl;
+		cout << "Для броска нажмите пробел" << endl;
+		play = _getch();
+		while (play != space)
+		{
+			cout << "Для броска нажмите пробел" << endl;
+			play = _getch();
+		}
+
+		Cube();
+		PlayerScore = p;
+		p = 0;
+		b = 0;
+		All_PlayerS += PlayerScore;
+
+		Cube();
+		CompScore = b;	
+		p = 0;
+		b = 0;
+		All_CompS += CompScore;
+		cout << " Компьютер  " << CompScore << " : " << PlayerScore << " Игрок " << endl;
+		}
+		system("cls");
+	}
+
+	cout << "Итоговый счет \n Компьютер " << All_CompS << " : " << All_PlayerS << " Игрок " << endl;
+
+	if (All_CompS > All_PlayerS)
+	{
+		cout << "Победил комьютер" << endl;
+	}
+	if (All_CompS < All_PlayerS)
+	{
+		cout << "Победил Игрок" << endl;
+	}
+	if (All_CompS == All_PlayerS)
+	{
+		cout << "Ничья" << endl;
+	}
+
+	system("pause");
+}
+		
+		
