@@ -1,0 +1,17 @@
+#include <iostream>
+#include "Children.h"
+using namespace std;
+int main()
+{
+	setlocale(LC_ALL, "Rus");
+
+	Children obj1;
+	obj1.Enter();
+	obj1.Screen();
+
+	Children obj2;
+	obj2.Enter();
+	obj2.Screen();
+
+	system("pause");
+}

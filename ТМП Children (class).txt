@@ -1,0 +1,29 @@
+﻿#pragma once
+#include <iostream>
+#include <string>
+#include <conio.h>
+using namespace std;
+
+class Children
+{
+private:
+	string name, lastname;
+	int old;
+public:
+	void Enter()
+	{
+		
+		cout << "Введите Имя" << endl;
+		getline(cin, name, '\n');
+		cout << "Введите Фамилию " << endl;
+		getline(cin, lastname, '\n');
+		cout << "Введите возраст " << endl;
+		cin >> old;
+		cin.get();
+	}
+	void Screen()
+	{
+		cout << "\n Имя : " << name << endl << "\n Фамилия : " << lastname << endl << "\n Возраст :  \n" << old << endl;
+	}
+};
+
