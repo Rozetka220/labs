@@ -46,13 +46,13 @@ int main()
 {
 	setlocale(LC_ALL, "Rus");
 	size_t a_one; size_t b_one;	
-	cout << "Ââåäèòå êîëè÷åñòâî ñòðîê è ñòîëáöîâ äëÿ ïåðâîé ìàòðèöû " << endl;
+	cout << "Ã‚Ã¢Ã¥Ã¤Ã¨Ã²Ã¥ ÃªÃ®Ã«Ã¨Ã·Ã¥Ã±Ã²Ã¢Ã® Ã±Ã²Ã°Ã®Ãª Ã¨ Ã±Ã²Ã®Ã«Ã¡Ã¶Ã®Ã¢ Ã¤Ã«Ã¿ Ã¯Ã¥Ã°Ã¢Ã®Ã© Ã¬Ã Ã²Ã°Ã¨Ã¶Ã» " << endl;
 	cin >> a_one >> b_one;
 	int **matrix_one = new int*[a_one];
 	memory(matrix_one, a_one, b_one);
 
 	size_t a_two, b_two;
-	cout << "Ââåäèòå êîëè÷åñòâî ñòðîê è ñòîëáöîâ äëÿ âòîðîé ìàòðèöû  " << endl;
+	cout << "Ã‚Ã¢Ã¥Ã¤Ã¨Ã²Ã¥ ÃªÃ®Ã«Ã¨Ã·Ã¥Ã±Ã²Ã¢Ã® Ã±Ã²Ã°Ã®Ãª Ã¨ Ã±Ã²Ã®Ã«Ã¡Ã¶Ã®Ã¢ Ã¤Ã«Ã¿ Ã¢Ã²Ã®Ã°Ã®Ã© Ã¬Ã Ã²Ã°Ã¨Ã¶Ã»  " << endl;
 	cin >> a_two >> b_two;
 	int **matrix_two = new int*[a_two];
 	memory(matrix_two, a_two, b_two);
@@ -62,22 +62,22 @@ int main()
 	while (a_one != b_two)  
 	{
 		system("cls");
-		cout << "Âû ââåëè íåêîððåêòíûé ðàçìåð ìàòðèö! Ïîæàëóéñòà, ïîâòîðèòå ïîïûòêó ñíîâà. " << endl;
-		cout << "Ââåäèòå êîëè÷åñòâî ñòðîê è ñòîëáöîâ äëÿ ïåðâîé ìàòðèöû  " << endl;
+		cout << "Ã‚Ã» Ã¢Ã¢Ã¥Ã«Ã¨ Ã­Ã¥ÃªÃ®Ã°Ã°Ã¥ÃªÃ²Ã­Ã»Ã© Ã°Ã Ã§Ã¬Ã¥Ã° Ã¬Ã Ã²Ã°Ã¨Ã¶! ÃÃ®Ã¦Ã Ã«Ã³Ã©Ã±Ã²Ã , Ã¯Ã®Ã¢Ã²Ã®Ã°Ã¨Ã²Ã¥ Ã¯Ã®Ã¯Ã»Ã²ÃªÃ³ Ã±Ã­Ã®Ã¢Ã . " << endl;
+		cout << "Ã‚Ã¢Ã¥Ã¤Ã¨Ã²Ã¥ ÃªÃ®Ã«Ã¨Ã·Ã¥Ã±Ã²Ã¢Ã® Ã±Ã²Ã°Ã®Ãª Ã¨ Ã±Ã²Ã®Ã«Ã¡Ã¶Ã®Ã¢ Ã¤Ã«Ã¿ Ã¯Ã¥Ã°Ã¢Ã®Ã© Ã¬Ã Ã²Ã°Ã¨Ã¶Ã»  " << endl;
 		cin >> a_one >> b_one;
-		cout << "Ââåäèòå êîëè÷åñòâî ñòðîê è ñòîëáöîâ äëÿ âòîðîé ìàòðèöû  " << endl;
+		cout << "Ã‚Ã¢Ã¥Ã¤Ã¨Ã²Ã¥ ÃªÃ®Ã«Ã¨Ã·Ã¥Ã±Ã²Ã¢Ã® Ã±Ã²Ã°Ã®Ãª Ã¨ Ã±Ã²Ã®Ã«Ã¡Ã¶Ã®Ã¢ Ã¤Ã«Ã¿ Ã¢Ã²Ã®Ã°Ã®Ã© Ã¬Ã Ã²Ã°Ã¨Ã¶Ã»  " << endl;
 		cin >> a_two >> b_two;
 	}
 		memory(matrix_one, a_one, b_one);
-		cout << "Ââåäèòå ýëåìåíòû ïåðâîé ìàòðèöû :" << endl;
+		cout << "Ã‚Ã¢Ã¥Ã¤Ã¨Ã²Ã¥ Ã½Ã«Ã¥Ã¬Ã¥Ã­Ã²Ã» Ã¯Ã¥Ã°Ã¢Ã®Ã© Ã¬Ã Ã²Ã°Ã¨Ã¶Ã» :" << endl;
 		enter(matrix_one, a_one, b_one);
-		cout <<"Ìàòðèöà ¹1 : " << endl;
+		cout <<"ÃŒÃ Ã²Ã°Ã¨Ã¶Ã  Â¹1 : " << endl;
 		screen(matrix_one, a_one, b_one);
 		cout << endl;
 		memory(matrix_two, a_two, b_two);
-		cout << "Ââåäèòå ýëåìåíòû âòîðîé ìàòðèöû :" << endl;
+		cout << "Ã‚Ã¢Ã¥Ã¤Ã¨Ã²Ã¥ Ã½Ã«Ã¥Ã¬Ã¥Ã­Ã²Ã» Ã¢Ã²Ã®Ã°Ã®Ã© Ã¬Ã Ã²Ã°Ã¨Ã¶Ã» :" << endl;
 		enter(matrix_two, a_two, b_two);
-		cout << "Ìàòðèöà ¹2 : " << endl;
+		cout << "ÃŒÃ Ã²Ã°Ã¨Ã¶Ã  Â¹2 : " << endl;
 		screen(matrix_two, a_two, b_two);
 
 	int **matrix_answer = new int*[a_one];
@@ -97,7 +97,7 @@ int main()
 			}
 		}
 	}
-	cout << "Îòâåò :" << endl;
+	cout << "ÃŽÃ²Ã¢Ã¥Ã² :" << endl;
 	screen(matrix_answer, a_one, b_two);
 	func_delete(matrix_one, a_one);
 	func_delete(matrix_two, a_two);
