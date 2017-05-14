@@ -1,0 +1,160 @@
+#include <windows.h>
+//#include <windowsx.h>
+bool R;
+static int sx, sy, LineToLine;
+// Прототип функции обработки сообщений с пользовательским названием:
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+
+int WINAPI WinMain(HINSTANCE hInst, // дескриптор экземпляра приложения
+	HINSTANCE hPrevInst, // не используем
+	LPSTR lpCmdLine, // не используем
+	int nCmdShow) // режим отображения окошка
+{
+	TCHAR szClassName[] = "Мой класс"; // строка с именем класса
+	HWND hMainWnd; // создаём дескриптор будущего окошка
+	MSG msg; // создём экземпляр структуры MSG для обработки сообщений
+	WNDCLASSEX wc; // создаём экземпляр, для обращения к членам класса WNDCLASSEX
+	wc.cbSize = sizeof(wc); // размер структуры (в байтах)
+	wc.style = CS_HREDRAW | CS_VREDRAW; // стиль класса окошка
+	wc.lpfnWndProc = WndProc; // указатель на пользовательскую функцию
+	wc.lpszMenuName = NULL; // указатель на имя меню (у нас его нет)
+	wc.lpszClassName = szClassName; // указатель на имя класса
+	wc.cbWndExtra = NULL; // число освобождаемых байтов в конце структуры
+	wc.cbClsExtra = NULL; // число освобождаемых байтов при создании экземпляра приложения
+	wc.hIcon = LoadIcon(NULL, IDI_WINLOGO); // декриптор пиктограммы
+	wc.hIconSm = LoadIcon(NULL, IDI_WINLOGO); // дескриптор маленькой пиктограммы (в трэе)
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW); // дескриптор курсора
+	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH); // дескриптор кисти для закраски фона окна
+	wc.hInstance = hInst; // указатель на строку, содержащую имя меню, применяемого для класса
+	if (!RegisterClassEx(&wc)) {
+		// в случае отсутствия регистрации класса:
+		MessageBox(NULL, "Не получилось зарегистрировать класс!", "Ошибка", MB_OK);
+		return NULL; // возвращаем, следовательно, выходим из WinMain
+	}
+	// Функция, создающая окошко:
+	hMainWnd = CreateWindow(
+		szClassName, // имя класса
+		"Полноценная оконная процедура", // имя окошка (то что сверху)
+		WS_OVERLAPPEDWINDOW | WS_VSCROLL, // режимы отображения окошка
+		CW_USEDEFAULT, // позиция окошка по оси х
+		NULL, // позиция окошка по оси у (раз дефолт в х, то писать не нужно)
+		CW_USEDEFAULT, // ширина окошка
+		NULL, // высота окошка (раз дефолт в ширине, то писать не нужно)
+		(HWND)NULL, // дескриптор родительского окна
+		NULL, // дескриптор меню
+		HINSTANCE(hInst), // дескриптор экземпляра приложения
+		NULL); // ничего не передаём из WndProc
+	if (!hMainWnd)
+	{
+		// в случае некорректного создания окошка (неверные параметры и тп):
+		MessageBox(NULL, "Не получилось создать окно!", "Ошибка", MB_OK);
+		return NULL;
+	}
+	ShowWindow(hMainWnd, nCmdShow); // отображаем окошко
+	UpdateWindow(hMainWnd); // обновляем окошко
+	while (GetMessage(&msg, NULL, NULL, NULL)) { // извлекаем сообщения из очереди, посылаемые фу-циями, ОС
+		TranslateMessage(&msg); // интерпретируем сообщения
+		DispatchMessage(&msg); // передаём сообщения обратно ОС
+	}
+	return msg.wParam; // возвращаем код выхода из приложения
+}
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	HDC hDC; // создаём дескриптор ориентации текста на экране
+	PAINTSTRUCT ps; // структура, сод-щая информацию о клиентской области (размеры, цвет и тп)
+	RECT rect; // стр-ра, определяющая размер клиентской области
+	COLORREF colorText = RGB(255, 0, 0); // задаём цвет текста
+	static HWND edit, edit1,edit2, edit3;
+	static HPEN hPenDefault, hPenCastom;
+
+	switch (uMsg) {
+	case WM_SIZE:
+		sx = LOWORD(lParam);//Ширина окна
+		sy = HIWORD(lParam);//Высота окна
+	case WM_CREATE:
+		hPenDefault = CreatePen(PS_SOLID, 2, RGB(0, 128, 0));
+		hPenCastom = CreatePen(PS_SOLID, 2, RGB(0, 0, 0));//заданные пользовтелем параметры кисти
+		CreateWindow("BUTTON", "Click me!", WS_CHILDWINDOW | WS_VISIBLE, sx - 100, sy - 100, 100, 100, hWnd, (HMENU)1, NULL, NULL);
+		edit = CreateWindow("EDIT", "1", WS_CHILDWINDOW | WS_VISIBLE | ES_AUTOHSCROLL | WS_BORDER | BS_PUSHBUTTON, 100, sy - 100, 100, 50, hWnd, (HMENU)2, NULL, NULL);
+		edit1 = CreateWindow("EDIT", "1", WS_CHILDWINDOW | WS_VISIBLE | ES_AUTOHSCROLL | WS_BORDER, 200, sy - 100, 100, 50, hWnd, (HMENU)3, NULL, NULL);
+		edit2 = CreateWindow("EDIT", "1", WS_CHILDWINDOW | WS_VISIBLE | ES_AUTOHSCROLL | WS_BORDER, 300, sy - 100, 100, 50, hWnd, (HMENU)4, NULL, NULL);
+		edit3 = CreateWindow("EDIT", "1", WS_CHILDWINDOW | WS_VISIBLE | ES_AUTOHSCROLL | WS_BORDER, 400, sy - 100, 100, 50, hWnd, (HMENU)5, NULL, NULL);
+		break;
+
+	case WM_COMMAND:
+		switch (wParam)
+		{
+		case 1:
+			R = true;
+			char buff1[128] = { "" };
+			char buff2[128] = { "" };
+			char buff3[128] = { "" };
+			char buff4[128] = { "" };
+			SendMessage(edit, WM_GETTEXT, MAX_PATH, (LPARAM)buff1);
+			SendMessage(edit1, WM_GETTEXT, MAX_PATH, (LPARAM)buff2);
+			SendMessage(edit2, WM_GETTEXT, MAX_PATH, (LPARAM)buff3);
+			SendMessage(edit3, WM_GETTEXT, MAX_PATH, (LPARAM)buff4);
+
+			hPenCastom = CreatePen(PS_SOLID, atoi(buff4), RGB(atoi(buff1), atoi(buff2), atoi(buff3)));
+			InvalidateRect(hWnd, NULL, TRUE);
+			break;
+		}
+
+	case WM_PAINT: // если нужно нарисовать, то:
+		if (R == true)
+		{
+			hDC = BeginPaint(hWnd, &ps); // инициализируем контекст устройства
+		
+			SelectObject(hDC, GetStockObject(WHITE_BRUSH));
+	
+			Rectangle(hDC, 5, 5, sx - 5, sy * 3 / 4);
+
+
+			SelectObject(hDC, hPenDefault);
+			//Внутренний
+			Rectangle(hDC, 30, 30, sx - 30, sy * 3 / 4 - 30);
+
+			//Боковые линии
+			MoveToEx(hDC, sx - 30, (sy * 3 / 4) / 4 + 15, NULL);
+			LineTo(hDC, 30 + 70, (sy * 3 / 4) / 4 + 15);
+
+			MoveToEx(hDC, 30, (sy * 3 / 4) / 2, NULL);
+			LineTo(hDC, sx - 100, (sy * 3 / 4) / 2);
+
+			MoveToEx(hDC, sx - 30, (sy * 3 / 4) / 2 + (sy * 3 / 4) / 4 - 15, NULL);
+			LineTo(hDC, 100, ((sy * 3 / 4) / 2 + (sy * 3 / 4) / 4 - 15));
+
+			//Зиг-заг
+			SelectObject(hDC, hPenCastom);
+			LineToLine = (((sy * 3 / 4) / 4 + 15) - 30) / 2;
+
+			MoveToEx(hDC, sx - 60, LineToLine + 30, NULL);
+			LineTo(hDC, 60, LineToLine + 30);
+
+			LineTo(hDC, 60, LineToLine * 3 + 30);
+
+			LineTo(hDC, sx - 60, LineToLine * 3 + 30);
+
+			LineTo(hDC, sx - 60, LineToLine * 5 + 30);
+
+			LineTo(hDC, 60, LineToLine * 5 + 30);
+
+			LineTo(hDC, 60, LineToLine * 7 + 30);
+
+			LineTo(hDC, sx - 60, LineToLine * 7 + 30);
+
+			EndPaint(hWnd, &ps); // заканчиваем рисовать
+		}
+		break;
+	case WM_DESTROY: // если окошко закрылось, то:
+		DeleteObject(hPenDefault);
+		DeleteObject(hPenCastom);
+		PostQuitMessage(NULL); // отправляем WinMain() сообщение WM_QUIT
+		break;
+	default:
+		return DefWindowProc(hWnd, uMsg, wParam, lParam); // если закрыли окошко
+	}
+	return NULL; // возвращаем значение
+}
+
