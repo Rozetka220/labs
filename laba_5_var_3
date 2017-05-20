@@ -1,0 +1,250 @@
+#include <windows.h>
+#include <cmath>
+#include <string>
+#include <ctime>
+using std::string;
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK ChildP(HWND, UINT, WPARAM, LPARAM);
+double TheArithmeticMean(int);
+int EvenElements(int);
+void CreateMas(int);
+double *Mas;
+double *buffMas;
+bool G = true;
+static int size;
+char Elements[128];
+HWND hChildHwnd;
+HWND hMainHwnd;
+HINSTANCE myDeskriptor;
+TCHAR szClassName[] = "My Class";
+TCHAR szClassName2[] = "Child Class";
+int WINAPI WinMain(HINSTANCE myDeskriptor, HINSTANCE hPrevInst, LPSTR lpCmdLine, int nCmdShow)
+{
+	
+	
+	MSG msg;
+	WNDCLASSEX wc;
+	wc.cbSize = sizeof(wc);
+	wc.style = CS_HREDRAW | CS_VREDRAW;
+	wc.lpfnWndProc = WndProc;
+	wc.lpszClassName = szClassName;
+	wc.cbWndExtra = NULL;
+	wc.cbClsExtra = NULL;
+	wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
+	wc.hIconSm = LoadIcon(NULL, IDI_WINLOGO);
+	wc.hCursor = LoadIcon(NULL, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)GetStockObject(WHITE_BRUSH);
+	wc.hInstance = myDeskriptor;
+	wc.lpszMenuName = NULL;
+	
+	if (!RegisterClassEx(&wc))
+	{
+		MessageBox(NULL, "Not reg class!", "Error", MB_OK);
+		return NULL;
+	}
+	
+	hMainHwnd = CreateWindow(szClassName, "Laba_5_var_3", WS_OVERLAPPEDWINDOW | WS_VSCROLL, CW_USEDEFAULT, NULL, CW_USEDEFAULT, NULL, (HWND)NULL, NULL, HINSTANCE(myDeskriptor), NULL);
+	if (!hMainHwnd)
+	{
+		MessageBox(NULL, "Cant create window!", "Error", MB_OK);
+		return NULL;
+	}
+	ShowWindow(hMainHwnd, nCmdShow);
+
+	//Child
+	WNDCLASSEX ch;
+	ch.cbSize = sizeof(ch);
+	ch.style = CS_HREDRAW | CS_VREDRAW;
+	ch.lpfnWndProc = ChildP;
+	ch.lpszClassName = szClassName2;
+	ch.cbWndExtra = NULL;
+	ch.cbClsExtra = NULL;
+	ch.hIcon = LoadIcon(NULL, IDI_WINLOGO);
+	ch.hIconSm = LoadIcon(NULL, IDI_WINLOGO);
+	ch.hCursor = LoadCursor(NULL, IDC_ARROW);
+	ch.hbrBackground = (HBRUSH)GetStockObject(GRAY_BRUSH);
+	ch.hInstance = myDeskriptor;
+	ch.lpszMenuName = NULL;
+	if (!RegisterClassEx(&ch))
+	{
+		MessageBox(NULL, "Cant reg class ch", "Error", MB_OK);
+		return NULL;
+	}
+
+	ShowWindow(hMainHwnd, SW_SHOW);
+
+	while (GetMessage(&msg, NULL, 0, 0))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	return msg.wParam;
+}
+
+LRESULT CALLBACK WndProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	static HWND ListBox, hLabel, hButtonGen, hButtonEven, hButtonArith, hEdit;
+	RECT rc;
+	char buff[64]; 
+	string buffer;
+	char word[64], AnswerArith_1[256], AnswerArith_2[256];
+	double k, ostatok, celaja, Elem;
+	GetClientRect(hwnd, &rc);
+	switch (message)
+	{
+	case WM_CREATE:
+		
+		ListBox = CreateWindow("LISTBOX", NULL, WS_CHILD | WS_VISIBLE | LBS_MULTIPLESEL | WS_BORDER | WS_VSCROLL | LBS_DISABLENOSCROLL, 30,  100, rc.right* 3/4, rc.bottom - 30, hwnd, (HMENU)0,NULL, NULL);
+		hLabel = CreateWindow("static", "Кол-во элементов массива",WS_CHILD | WS_VISIBLE | WS_TABSTOP,rc.right - 100, rc.bottom - 450, 150, 16,hwnd, (HMENU)1,NULL, NULL); //(HINSTANCE)GetWindowLong(hwnd, GWL_HINSTANCE)
+		hLabel = CreateWindow("static", "Элементы массива",WS_CHILD | WS_VISIBLE | WS_TABSTOP,30, 50, 150, 16,hwnd, (HMENU)1,NULL, NULL);
+		hButtonGen = CreateWindow("BUTTON", "Generation", WS_CHILD | WS_BORDER|WS_VISIBLE, rc.right - 100, rc.bottom - 100, 100, 50, hwnd, (HMENU)1, NULL, NULL);
+		hButtonEven = CreateWindow("BUTTON", "Even", WS_CHILD| WS_BORDER |WS_VISIBLE, rc.right - 100, rc.bottom - 200, 100, 50, hwnd, (HMENU)2, NULL, NULL);
+		hButtonArith = CreateWindow("BUTTON", "Arith", WS_CHILD | WS_BORDER | WS_VISIBLE, rc.right - 100, rc.bottom - 300, 100, 50, hwnd, (HMENU)3, NULL, NULL);
+		hEdit = CreateWindow("EDIT", NULL, WS_CHILD | WS_BORDER | WS_VISIBLE, rc.right - 100, rc.bottom - 400, 100, 50, hwnd, (HMENU)4, NULL, NULL);
+	case WM_COMMAND:
+		switch (wParam)
+		{
+		case 1:
+			if (G == false)
+			{
+				delete[] Mas;
+				delete[] buffMas;
+			}
+			SendMessage(hEdit, WM_GETTEXT, MAX_PATH, (LPARAM)buff);
+			size = atoi(buff);
+			if (size <= 100)
+			{
+				CreateMas(size);
+				G = false;
+				for (int i = 0; i < size; i++)
+				{
+					_itoa_s(Mas[i], word, 10);
+					SendMessage(ListBox, LB_ADDSTRING, 0, (LPARAM)word);
+				}	
+			}
+			else
+			{
+				MessageBox(hwnd, "Вы ввели больше 100 элементов!", "Error", MB_OK);
+			}
+			break;
+		case 2:
+			Elem = EvenElements(size);
+			_itoa_s(Elem, Elements, 10);
+			hChildHwnd = CreateWindow(szClassName2, "child window", WS_OVERLAPPEDWINDOW | WS_VSCROLL, 0, 0, 500, 500, (HWND)hMainHwnd, NULL, myDeskriptor, NULL);
+			if (!hChildHwnd)
+			{
+				MessageBox(NULL, "Cant create window!", "Error", MB_OK);
+				return NULL;
+			}
+			ShowWindow(hChildHwnd, SW_SHOW);	
+			break;
+		case 3:
+			if (size == 0)
+			{
+				MessageBox(hwnd, "Массив еще не создан ", "Внимание", MB_OK);
+			}
+			else
+			{
+				k = TheArithmeticMean(size);
+				ostatok = modf(k, &celaja);
+				ostatok = ostatok * 10;
+				_itoa_s(ostatok, AnswerArith_1, 10);
+				_itoa_s(celaja, AnswerArith_2, 10);
+				strcat_s(AnswerArith_2, ",");
+				strcat_s(AnswerArith_2, AnswerArith_1);
+				MessageBox(hwnd, AnswerArith_2, "Внимание", MB_OK);
+			}
+			break;
+		}
+		break;
+	case WM_DESTROY:
+		PostQuitMessage(0);       /* send a WM_QUIT to the message queue */
+		break;
+	default:                      /* for messages that we don't deal with */
+		return DefWindowProc(hwnd, message, wParam, lParam);
+	}
+	return 0;
+}
+
+	LRESULT CALLBACK ChildP(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam)
+	{
+		static HWND child, ListBox, hLabel, hButtonOk, hEdit;
+
+
+		switch (message)                  /* handle the messages */
+		{
+		case WM_CREATE:
+
+			hLabel = CreateWindow("static", "Кол-во четных элементов : ", WS_CHILD | WS_VISIBLE | WS_TABSTOP, 30, 80, 150, 16, hwnd, (HMENU)0, NULL, NULL);
+			hButtonOk = CreateWindow("BUTTON", "Ok", WS_CHILD | WS_BORDER | WS_VISIBLE, 150, 150, 100, 50, hwnd, (HMENU)1, NULL, NULL);
+			hEdit = CreateWindow("EDIT", NULL, WS_CHILD | WS_BORDER | WS_VISIBLE | ES_READONLY, 200, 100, 100, 50, hwnd, (HMENU)0, NULL, NULL);
+			SendMessage(hEdit, WM_SETTEXT, 0, (LPARAM)Elements);
+			break;
+		case WM_COMMAND:
+			switch (wParam)
+			{
+			case 1:
+				ShowWindow(hChildHwnd, SW_HIDE);
+				break;
+			}
+			break;
+		case WM_DESTROY:
+
+			break;
+		default:                      /* for messages that we don't deal with */
+			return DefWindowProc(hwnd, message, wParam, lParam);
+
+		}
+
+		return 0;
+	}
+
+double TheArithmeticMean(int size)
+{
+	double k, l;
+	k = 0;
+	l = 0;
+	for (int i = 0; i < size; i++)
+	{
+		Mas[i] = buffMas[i];
+		l++;
+		if (Mas[i] < 0)
+		{
+			k -= Mas[i];
+		}
+	}
+	k= abs(k);
+	k = k / l;
+	
+	return k;
+}
+int EvenElements(int size)
+{
+	int k; 
+	double buff, ostatok;
+	double x;
+	k = 0;
+	for (int i = 0; i < size; i++)
+	{
+		Mas[i] = buffMas[i];
+		buff = Mas[i] / 2;
+		buff = abs(buff);
+		ostatok = modf(buff, &x);
+		if (ostatok == 0)
+		{
+			k++;
+		}
+	}
+	return k;
+}
+void CreateMas(int size)
+{
+	srand(unsigned(time(NULL)));
+	Mas = new double[size];
+	buffMas = new double[size];
+	for (int i = 0; i < size; i++)
+	{
+		Mas[i] = rand()%10 - 10;
+		buffMas[i] = Mas[i];
+	}
+}
