@@ -1,0 +1,205 @@
+//
+// MainPage.xaml.cpp
+// Реализация класса MainPage.
+//
+
+#include "pch.h"
+#include "MainPage.xaml.h"
+#include <cstdlib>
+#include <ctime>
+#include <chrono>
+#include <string>
+#include <thread>
+#include <mutex>
+
+using namespace project;
+
+using namespace Platform;
+using namespace Windows::Foundation;
+using namespace Windows::Foundation::Collections;
+using namespace Windows::UI::Xaml;
+using namespace Windows::UI::Xaml::Controls;
+using namespace Windows::UI::Xaml::Controls::Primitives;
+using namespace Windows::UI::Xaml::Data;
+using namespace Windows::UI::Xaml::Input;
+using namespace Windows::UI::Xaml::Media;
+using namespace Windows::UI::Xaml::Navigation;
+
+// Документацию по шаблону элемента "Пустая страница" см. по адресу https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x419
+
+std::mutex mtx, sync_mtx1, sync_mtx2;
+std::condition_variable cond_var;
+size_t arr_size = 10;
+int *arr= new int[arr_size];
+bool checkbox_sync = false;
+
+int global_test = 0;
+	
+MainPage::MainPage()
+{
+	InitializeComponent();
+}
+
+void Generate_Array () {
+	srand(time(NULL));
+	for (size_t indx = 0; indx < arr_size; indx++) {
+		arr[indx] = rand() % 10;
+	}
+}
+
+void Sort_Bubble() {
+	std::unique_lock<std::mutex> lock1(sync_mtx1);  //Закрываем мьютекс 
+	cond_var.wait(lock1); //Ставим его на ожидание
+	global_test = 1;
+	int temp;
+	//std::this_thread::sleep_for(std::chrono::seconds(5));
+	for (size_t i = 0; i < arr_size - 1; i++) {
+		for (size_t j = 0; j < arr_size - i - 1; j++) {
+			if (checkbox_sync)
+			{
+				mtx.lock();
+				if (arr[j] > arr[j + 1]) {
+					temp = arr[j];
+					//std::this_thread::sleep_for(std::chrono::microseconds(5));
+					arr[j] = arr[j + 1];
+					arr[j + 1] = temp;
+				}
+				mtx.unlock();
+			}
+			else {	
+				if (arr[j] > arr[j + 1]) {
+					temp = arr[j];
+					std::this_thread::sleep_for(std::chrono::milliseconds(2));
+					arr[j] = arr[j + 1];
+					arr[j + 1] = temp;
+				}	
+			}
+		}
+	}
+
+
+
+
+}
+
+void Sort_Max() {
+	std::unique_lock<std::mutex> lock2(sync_mtx2);  //Закрываем мьютекс 
+	cond_var.wait(lock2); //Ставим его на ожидание
+	global_test = 2;
+	//std::this_thread::sleep_for(std::chrono::seconds(5));
+		for (size_t idx_i = 0; idx_i < arr_size - 1; idx_i++) {
+		if (checkbox_sync)
+		{
+			mtx.lock();
+			size_t min_idx = idx_i;
+			for (size_t idx_j = idx_i + 1; idx_j < arr_size; idx_j++) {
+				if (arr[idx_j] < arr[min_idx]) {
+					min_idx = idx_j;
+				}
+			}
+
+			if (min_idx != idx_i) {
+				std::swap(arr[idx_i], arr[min_idx]);
+				min_idx = idx_i;
+			}
+			mtx.unlock();
+		} else {
+			
+			size_t min_idx = idx_i;
+			for (size_t idx_j = idx_i + 1; idx_j < arr_size; idx_j++) {
+				if (arr[idx_j] < arr[min_idx]) {
+					min_idx = idx_j;
+				}
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			if (min_idx != idx_i) {
+				std::swap(arr[idx_i], arr[min_idx]);
+				min_idx = idx_i;
+			}
+		}
+	}
+	
+}
+std::wstring convert_tostring() {
+	std::wstring str;
+	for (size_t indx = 0; indx < arr_size; indx++) {
+		str = str + std::to_wstring(arr[indx]) + L' ';
+	}
+	return str;
+}
+
+void project::MainPage::Button_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	Generate_Array();
+	std::wstring str = convert_tostring();
+	String^ Str = ref new String(str.c_str());
+	textBox->Text = Str;
+}
+
+
+void project::MainPage::Button1_Click(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	std::thread thBubble(Sort_Bubble);
+	std::thread thMax(Sort_Max);
+
+	int lel;
+	cond_var.notify_all(); //Снимаем все спящие мьютексы с ожидания 
+
+	thBubble.join();
+	thMax.join();
+
+	std::wstring str = convert_tostring();
+	String^ Str = ref new String(str.c_str());
+	textBox1->Text = Str;
+
+	/*
+	double TimeRun = clock() / 1000.0;
+	std::wstring TimeRunToSting = std::to_wstring(TimeRun);
+	String^ StrTime = ref new String(TimeRunToSting.c_str());
+	textBlock2->Text = StrTime;	
+	*/
+}
+
+
+
+
+
+void project::MainPage::CheckBox_Checked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	checkbox_sync = true;
+}
+
+
+void project::MainPage::CheckBox_Unchecked(Platform::Object^ sender, Windows::UI::Xaml::RoutedEventArgs^ e)
+{
+	checkbox_sync = false;
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+xaml
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+<Page
+    x:Class="project.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:project"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <TextBox x:Name="textBox" HorizontalAlignment="Left" Height="60" Margin="200,46,0,0" Text="" VerticalAlignment="Top" Width="500" />
+        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Height="60" Margin="23,46,0,0" Text="New array" TextWrapping="Wrap" VerticalAlignment="Top" Width="130"/>
+        <TextBlock x:Name="textBlock1" HorizontalAlignment="Left" Height="60" Margin="23,135,0,0" Text="Sort array" TextWrapping="Wrap" VerticalAlignment="Top" Width="130"/>
+        <TextBox x:Name="textBox1" HorizontalAlignment="Left" Height="60" Margin="200,135,0,0" Text="" VerticalAlignment="Top" Width="500"/>
+        <CheckBox x:Name="checkBox" Content="Sync" HorizontalAlignment="Left" Margin="213,274,0,0" VerticalAlignment="Top" Width="487" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
+        <Button x:Name="button" Content="Generation" HorizontalAlignment="Left" Height="95" Margin="200,0,0,0" VerticalAlignment="Center" Width="250" Click="Button_Click"/>
+        <Button x:Name="button1" Content="Sort" HorizontalAlignment="Left" Height="95" Margin="450,0,0,0" VerticalAlignment="Center" Width="250" Click="Button1_Click"/>
+        <TextBlock x:Name="textBlock2" HorizontalAlignment="Left" Height="60" Margin="1342,46,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="100"/>
+    </Grid>
+</Page>
